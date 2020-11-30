@@ -11,10 +11,12 @@ public class Main {
 
         // GUI
         JFrame window = new JFrame("Wypożyczalnia samochodów");
-        window.add(new MyPanel());
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setSize(1200, 600);
         window.setVisible(true);
+        window.add(new MyPanel());
         window.pack();
+
 
     }
 

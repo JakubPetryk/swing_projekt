@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 public class noweOkno {
 
         JFrame frame = new JFrame("Twoj wybor");
-        JLabel label = new JLabel("Wybierz samochód z tabeli");
+        JLabel label = new JLabel("Samochody wypożyczone");
 
         noweOkno() {
 

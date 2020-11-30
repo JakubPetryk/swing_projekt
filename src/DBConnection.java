@@ -99,6 +99,31 @@ public class DBConnection {
         return -1;
     }
 
+    public static long DodajWypozyczenie(int ID_Klient, int ID_Samochody, String dlugosc_wypozyczenia, double cena) {
+
+        String record = "INSERT INTO Wypozyczenia (ID_Klient, Samochody_ID, dlugosc_wypozyczenia, cena)" +
+                "VALUES (?, ?, ?, ?)";
+        try {
+            Connection connection = DBConnection.DBConnect();
+            PreparedStatement preparedStatement = connection.prepareStatement(record, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, ID_Klient);
+            preparedStatement.setInt(2, ID_Samochody);
+            preparedStatement.setString(3, dlugosc_wypozyczenia);
+            preparedStatement.setDouble(4, cena);
+            preparedStatement.executeUpdate();
+
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Błąd z pobraniem identyfikatora.");
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
 
 }
 

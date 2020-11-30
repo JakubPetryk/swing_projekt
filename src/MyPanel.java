@@ -19,8 +19,7 @@ public class MyPanel extends JPanel implements ActionListener {
     JButton mybutton, bOddaj, bWypozycz;
     JLabel LabelImie, LabelNazwisko, LabelDni, LabelCena, LabelSamochody, LabelWypozyczone, LabelKlient;
     JPanel panel;
-
-
+    JList DlugoscWypoz;
 
     public MyPanel() {
 
@@ -68,12 +67,17 @@ public class MyPanel extends JPanel implements ActionListener {
         FieldNazwisko.setBounds(xField, 200, 200, 20);
         add(FieldNazwisko);
 
-        FieldDni = new JTextField("Ilość Dni");
-        FieldDni.setBounds(xField, 250, 200, 20);
-        add(FieldDni);
+       // FieldDni = new JTextField("Ilość Dni");
+       // FieldDni.setBounds(xField, 250, 200, 20);
+       // add(FieldDni);
+
+        DlugoscWypoz = new JList<String>( new String[]
+                {" do 24h","od 24h do 72h","od 72h do 168", "powyżej tygodnia" });
+        DlugoscWypoz.setBounds(xField,250,100,75 );
+        add(DlugoscWypoz);
 
         FieldCena = new JTextField("Cena");
-        FieldCena.setBounds(xField, 300, 200, 20);
+        FieldCena.setBounds(xField, 350, 200, 20);
         add(FieldCena);
 
         bWypozycz = new JButton("Wypozycz Auto");
@@ -100,74 +104,21 @@ public class MyPanel extends JPanel implements ActionListener {
 
         TableWypozyczone = new JTable();
 
-        panel = new JPanel();
-
-
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.black);
         panel.setLayout(new BorderLayout());
 
         JScrollPane pane = new JScrollPane(TableSamochody);
-
         panel.add(pane, BorderLayout.CENTER);
 
         TableSamochody.setBounds(20, 100, 300, 250);
         add(TableSamochody);
 
-        TableWypozyczone.setBounds(800,100,300, 250 );
+        TableWypozyczone.setBounds(800, 100, 300, 250);
         add(TableWypozyczone);
-
 
         odswiezSamochody();
     }
-   /*     List<Klijent> klienci = DBConnection.pobierzKlientow();
-
-        DefaultTableModel model = new DefaultTableModel();
-        Object[] columnsName = new Object[2];
-        columnsName[0] = "Imie";
-        columnsName[1] = "Nazwisko";
-
-        model.setColumnIdentifiers(columnsName);
-
-        Object[] rowData = new Object[2];
-
-        for (int i = 0; i < klienci.size(); i++) {
-
-            rowData[0] = klienci.get(i).getImie();
-            rowData[1] = klienci.get(i).getNazwisko();
-
-            model.addRow(rowData);
-
-        }
-
-
-        List<Samochody> samochodyDane = DBConnection.pobierzSamochody();
-
-        DefaultTableModel model1 = new DefaultTableModel();
-        Object[] columnsName1 = new Object[1];
-        columnsName1[0] = "Nazwa";
-
-        model1.setColumnIdentifiers(columnsName1);
-
-        Object[] rowData1 = new Object[1];
-
-        rowData1[1] = samochodyDane.get(1);
-        model.addRow(rowData1);
-
-        tKlijent = new JTable();
-        tKlijent.setModel(model);
-        frame.setLayout(new BorderLayout());
-        JScrollPane pane = new JScrollPane(tKlijent);
-        frame.add(pane, BorderLayout.CENTER);
-        tKlijent.setBounds(400, 50, 300, 150);
-        frame.add(tKlijent);
-
-        tSamochody = new JTable();
-        tSamochody.setModel(model1);
-        frame.setLayout(new BorderLayout());
-        JScrollPane pane1 = new JScrollPane(tSamochody);
-        frame.add(pane1, BorderLayout.CENTER);
-        tSamochody.setBounds(100,250, 300,150 );
-        frame.add(tSamochody);
-*/
 
 
     public void odswiezSamochody() {
@@ -208,8 +159,7 @@ public class MyPanel extends JPanel implements ActionListener {
         if (e.getSource() == mybutton) {
 
             noweOkno noweokno = new noweOkno();
-        }
-        else if (e.getSource() == bWypozycz) {
+        } else if (e.getSource() == bWypozycz) {
             wypozyczSamochod();
         }
 
@@ -218,9 +168,22 @@ public class MyPanel extends JPanel implements ActionListener {
     public void wypozyczSamochod() {
         String imie = FieldImie.getText();
         String nazwisko = FieldNazwisko.getText();
-        DBConnection.DodajKlienta(imie, nazwisko);
+        String dlugosc_wypozyczenia = DlugoscWypoz.getSelectedValue().toString();
+        Double cena = Double.parseDouble(FieldCena.getText());
+        long idnowy = DBConnection.DodajKlienta(imie, nazwisko);
+        int wybranyWierszSamochod = TableSamochody.getSelectedRow();
+        String wybranyIdSamochoduString = TableSamochody.getModel().getValueAt(wybranyWierszSamochod, 0).toString();
+        int wybranyIdSamochoduInt = Integer.parseInt(wybranyIdSamochoduString);
+
+        System.out.println("dlugosc_wypozyczenia " + dlugosc_wypozyczenia);
+        System.out.println("cena" + cena);
+        System.out.println("idnowy" + idnowy);
+        System.out.println("wybranyIdSamochoduInt" + wybranyIdSamochoduInt);
+
+        DBConnection.DodajWypozyczenie((int) idnowy, wybranyIdSamochoduInt, dlugosc_wypozyczenia, cena);
+
     }
-
-
 }
+
+
 

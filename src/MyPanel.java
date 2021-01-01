@@ -1,51 +1,40 @@
-import javax.swing.*;
+ import com.toedter.calendar.JCalendar;
+ import com.toedter.calendar.JDateChooser;
+ import com.toedter.calendar.JDateChooserCellEditor;
+
+ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class MyPanel extends JPanel implements ActionListener {
 
     JTextField FieldImie, FieldNazwisko, FieldDni, FieldCena;
-    JTable TableSamochody, TableWypozyczone;
-    JFrame frame = new JFrame("Wypozyczalnia samochdow");
-    JButton mybutton, bOddaj, bWypozycz;
+    JTable TableSamochody, TableWypozyczenia;
+    JButton mybutton, bOddaj, bWypozycz, usunPozycje;
     JLabel LabelImie, LabelNazwisko, LabelDni, LabelCena, LabelSamochody, LabelWypozyczone, LabelKlient;
-    JPanel panel;
     JList DlugoscWypoz;
+    JDateChooser data;
 
     public MyPanel() {
 
-
-/*
-        frame.add(mybutton);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 600);
-        frame.setLayout(null);
-        frame.setVisible(true);
-*/
-        // TextFields Imie, Nazwisko, Ilosc Dni , Cena
-
         setLayout(null);
+        setBackground(new Color(0x9471));
 
         // wybor menagera tutaj zaden
 // SEKCJA SAMOCHODY Dostepne do wypozyczenia:
 
         LabelSamochody = new JLabel("Samochody dostepne");
-        LabelSamochody.setBounds(100, 50, 200, 20);
+        LabelSamochody.setBounds(50, 50, 200, 20);
         add(LabelSamochody);
 
         // SEKCJA SAMOCHODY WYPOZYCZONE
 
         LabelWypozyczone = new JLabel("Wypozyczone samochody");
-        LabelWypozyczone.setBounds(900, 50, 200, 20);
+        LabelWypozyczone.setBounds(650, 50, 200, 20);
         add(LabelWypozyczone);
 
         //SEKCJA DO WPISYWANIA KLIENTA I WYPOZYCZENIA
@@ -83,11 +72,25 @@ public class MyPanel extends JPanel implements ActionListener {
         bWypozycz = new JButton("Wypozycz Auto");
         bWypozycz.setBounds(400, 400, 150, 30);
         add(bWypozycz);
+        bWypozycz.addActionListener(this);
 
-// SEKCJA ODDAJ AUTO
-        bOddaj = new JButton("Oddaj Auto");
-        bOddaj.setBounds(800, 400, 150, 30);
+       /* data = new JDateChooser();
+        data.setBounds(750,400,200,50 );
+        add(data);
+*/
+        usunPozycje = new JButton("usuń pozycję");
+        usunPozycje.setBounds(750, 400, 200, 50 );
+
+
+
+
+
+//  odswierz tabele wypozyczenia
+        bOddaj = new JButton("Odswiez tabele");
+        bOddaj.setBounds(450, 450, 150, 30);
         add(bOddaj);
+        bOddaj.addActionListener(this);
+
 
         mybutton = new JButton("Wybierz samochód");
         mybutton.setBounds(200, 400, 150, 40);
@@ -96,28 +99,24 @@ public class MyPanel extends JPanel implements ActionListener {
         mybutton.addActionListener(this);
 
 
-        //button.setText("Kliknij");
-        //dispose() wyjscie po kliknieciu
-        bWypozycz.addActionListener(this);
-
         TableSamochody = new JTable();
+        TableWypozyczenia = new JTable();
 
-        TableWypozyczone = new JTable();
-
-        JPanel panel = new JPanel();
+       /* JPanel panel = new JPanel();
         panel.setBackground(Color.black);
         panel.setLayout(new BorderLayout());
 
         JScrollPane pane = new JScrollPane(TableSamochody);
         panel.add(pane, BorderLayout.CENTER);
-
+*/
         TableSamochody.setBounds(20, 100, 300, 250);
         add(TableSamochody);
 
-        TableWypozyczone.setBounds(800, 100, 300, 250);
-        add(TableWypozyczone);
+        TableWypozyczenia.setBounds(650, 100, 500, 250);
+        add(TableWypozyczenia);
 
         odswiezSamochody();
+        odswiezWypozyczenia();
     }
 
 
@@ -181,8 +180,42 @@ public class MyPanel extends JPanel implements ActionListener {
         System.out.println("wybranyIdSamochoduInt" + wybranyIdSamochoduInt);
 
         DBConnection.DodajWypozyczenie((int) idnowy, wybranyIdSamochoduInt, dlugosc_wypozyczenia, cena);
-
+        odswiezWypozyczenia();
     }
+
+
+    public void  odswiezWypozyczenia() {
+        System.out.println("odswieWypozyczenia - Start");
+        DefaultTableModel model = new DefaultTableModel();
+        Object[] columnsName = new Object[5];
+        columnsName[0] = "imie";
+        columnsName[1] = "nazwisko";
+        columnsName[2] = "nazwa";
+        columnsName[3] = "dlugosc_wypozyczenia";
+        columnsName[4] = "cena";
+
+        model.setColumnIdentifiers(columnsName);
+
+        Object[] rowData = new Object[5];
+
+        List<Wypozyczenia> wypozyczenia = DBConnection.pobierzWypozyczenia();
+        System.out.println("odswiezWypozyczenia - Ilość pobranych wypozyczeń: " + wypozyczenia.size());
+        for (int i = 0; i < wypozyczenia.size(); i++) {
+            Wypozyczenia wypozyczenie = wypozyczenia.get(i);
+            rowData[0] = wypozyczenie.getImie();
+            rowData[1] = wypozyczenie.getNazwisko();
+            rowData[2] = wypozyczenie.getNazwa();
+            rowData[3] = wypozyczenie.getDlugosc_wypozyczenia();
+            rowData[4] = wypozyczenie.getCena();
+
+            model.addRow(rowData);
+
+        }
+
+        TableWypozyczenia.setModel(model);
+        System.out.println("odswiezWypozyczenia - Koniec");
+    }
+
 }
 
 

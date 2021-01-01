@@ -125,6 +125,31 @@ public class DBConnection {
         return -1;
     }
 
+    public static List<Wypozyczenia> pobierzWypozyczenia() {
+        List<Wypozyczenia> wypozyczeniaDane = new ArrayList<>();
+        String query = "SELECT O.imie, O.nazwisko, N.nazwa, dlugosc_wypozyczenia, cena  FROM Wypozyczenia " +
+                "AS W INNER JOIN Klient AS O ON W.ID_Klient = O.ID_Klient " +
+                "INNER JOIN Samochody AS N ON W.Samochody_ID = N.ID_Samochody";
+        try {
+            Connection connection = DBConnection.DBConnect();
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            System.out.println("pobierzWypozyczenia - iloc rekordow -" + rs.getFetchSize());
+            while (rs.next()) {
+
+                Wypozyczenia auta = new Wypozyczenia(rs.getString("imie"), rs.getString("nazwisko")
+                        , rs.getString("Nazwa"), rs.getString("dlugosc_wypozyczenia"), rs.getInt("cena"));
+                wypozyczeniaDane.add(auta);
+            }
+            //disconnectDB();
+
+
+        } catch (SQLException e) {
+            System.err.println("SQL error " + e.getMessage());
+        }
+
+        return wypozyczeniaDane;
+    }
 }
 
 
